@@ -36,7 +36,7 @@ class Trigger(Entity):
                 continue
 
             dist = distance(other, self)
-            if not other in self.triggerers and dist <= self.radius:
+            if other not in self.triggerers and dist <= self.radius:
                 self.triggerers.append(other)
                 if hasattr(self, 'on_trigger_enter'):
                     self.on_trigger_enter()

@@ -72,7 +72,7 @@ if __name__ == '__main__':
         #texture='shore'
     )
     b.model.mode = 'point'
-    b.model.colors = [color.random_color() for e in b.model.vertices]
+    b.model.colors = [color.random_color() for _ in b.model.vertices]
     b.model.generate()
     b.shader = point_shader
     GrayPlane(scale=10, y=-2, texture='shore')

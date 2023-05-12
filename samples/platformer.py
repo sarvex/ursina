@@ -13,7 +13,7 @@ camera.fov = 20
 ground = Entity(model='cube', color=color.olive.tint(-.4), z=-.1, y=-1, origin_y=.5, scale=(1000,100,10), collider='box', ignore=True)
 
 random.seed(4)
-for i in range(10):
+for _ in range(10):
     Entity(model='cube', color=color.dark_gray, collider='box', ignore=True, position=(random.randint(-20,20), random.randint(0,10)), scale=(random.randint(1,20), random.randint(2,5), 10))
 # ground = Entity(model='cube', color=color.white33, origin_y=.5, scale=(20, 10, 1), collider='box')
 # wall = Entity(model='cube', color=color.azure, origin=(-.5,.5), scale=(5,10), x=10, y=.5, collider='box')

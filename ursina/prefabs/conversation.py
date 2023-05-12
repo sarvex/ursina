@@ -73,11 +73,14 @@ class Conversation(Entity):
             answers.append(child)
 
         # multi page question
-        if len(node.content) > 1 and self.question_part < len(node.content)-1:
-            if self.question_part < len(node.content): # question not finished, so don't show answer buttons
-                # print('question not finished')
-                self.question_appear_sequence.append(Func(setattr, self.more_indicator, 'enabled', True))
-                return
+        if (
+            len(node.content) > 1
+            and self.question_part < len(node.content) - 1
+            and self.question_part < len(node.content)
+        ):
+            # print('question not finished')
+            self.question_appear_sequence.append(Func(setattr, self.more_indicator, 'enabled', True))
+            return
 
         self.button_appear_sequence = Sequence()
         invoke(self.button_appear_sequence.start, delay=self.question_appear_sequence.duration)
@@ -125,7 +128,11 @@ class Conversation(Entity):
 
 
     def input(self, key):
-        if key == 'left mouse down' or key == 'space' and not mouse.hovered_entity in self.buttons:
+        if (
+            key == 'left mouse down'
+            or key == 'space'
+            and mouse.hovered_entity not in self.buttons
+        ):
             self.next()
 
 
@@ -152,7 +159,7 @@ class Conversation(Entity):
 
     def parse_conversation(self, convo):
         convo = convo.strip()
-        nodes = list()
+        nodes = []
         prev_node = None
         node_index = 0
 
@@ -182,7 +189,7 @@ class Conversation(Entity):
             if n.is_answer:
                 content = content[2:]
             n.content = [content, ]
-            n.children = list()
+            n.children = []
             n.code = code
             nodes.append(n)
             prev_node = n

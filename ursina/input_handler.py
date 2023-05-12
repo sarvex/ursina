@@ -90,24 +90,24 @@ class Keys(Enum):
 
 
 held_keys = defaultdict(lambda: 0)
-rebinds = dict()
+rebinds = {}
 
 
 def bind(original_key, alternative_key):
     rebinds[original_key] = alternative_key
     if ' mouse ' in alternative_key:
-        rebinds[original_key + ' up'] = alternative_key[:-5] + ' up'
+        rebinds[f'{original_key} up'] = f'{alternative_key[:-5]} up'
         return
 
-    rebinds[original_key + ' hold'] = alternative_key + ' hold'
-    rebinds[original_key + ' up'] = alternative_key + ' up'
+    rebinds[f'{original_key} hold'] = f'{alternative_key} hold'
+    rebinds[f'{original_key} up'] = f'{alternative_key} up'
 
 
 def unbind(key):
     if key in rebinds:
         del rebinds[key]
-        del rebinds[key + ' hold']
-        del rebinds[key + ' up']
+        del rebinds[f'{key} hold']
+        del rebinds[f'{key} up']
     else:
         rebinds[key] = 'none'
 

@@ -161,7 +161,7 @@ def indentation(line):
 
 
 def get_module_attributes(str):
-    attrs = list()
+    attrs = []
 
     for l in str.split('\n'):
         if len(l) == 0:
@@ -174,7 +174,7 @@ def get_module_attributes(str):
 
 
 def get_classes(str):
-    classes = dict()
+    classes = {}
     for c in str.split('\nclass ')[1:]:
         class_name = c.split(':', 1)[0]
         if class_name.startswith(('\'', '"')):
@@ -186,7 +186,7 @@ def get_classes(str):
 
 
 def get_class_attributes(str):
-    attributes = list()
+    attributes = []
     lines = str.split('\n')
     start = 0
     end = len(lines)
@@ -200,7 +200,7 @@ def get_class_attributes(str):
                 break
 
             start = i
-            for j in range(i+1, len(lines)):
+            for j in range(start + 1, len(lines)):
                 if (indentation(lines[j]) == indentation(line)
                 and not lines[j].strip().startswith('def late_init')
                 ):
@@ -234,7 +234,7 @@ def get_class_attributes(str):
                 for l in init_section[start+1:end]:
                     value += '\n' + l[4:]
 
-            attributes.append(key + ' = ' + value)
+            attributes.append(f'{key} = {value}')
 
     if '@property' in code:
         for i, line in enumerate(lines):
@@ -245,17 +245,17 @@ def get_class_attributes(str):
                 if '#' in lines[i+1]:
                     name += ((20-len(name)) * ' ') + '<gray>#' + lines[i+1].split('#',1)[1] + '</gray>'
 
-                if not name in [e.split(' = ')[0] for e in attributes]:
+                if name not in [e.split(' = ')[0] for e in attributes]:
                     attributes.append(name)
 
     return attributes
 
 
 def get_functions(str, is_class=False):
-    functions = dict()
+    functions = {}
     lines = str.split('\n')
 
-    functions = list()
+    functions = []
     lines = str.split('\n')
     # ignore_functions_for_property_generation = 'generate_properties(' in str
 
@@ -298,7 +298,7 @@ def clear_tags(str):
 
 def get_example(str, name=None):    # use name to highlight the relevant class
     key = '''if __name__ == '__main__':'''
-    lines = list()
+    lines = []
     example_started = False
     for l in str.split('\n'):
         if example_started:
@@ -315,10 +315,14 @@ def get_example(str, name=None):    # use name to highlight the relevant class
         ignore = ()
 
 
-    lines = [e for e in example.split('\n') if not e in ignore and not e.strip().startswith('#')]
+    lines = [
+        e
+        for e in example.split('\n')
+        if e not in ignore and not e.strip().startswith('#')
+    ]
 
     import re
-    styled_lines = list()
+    styled_lines = []
 
     for line in lines:
         line = line.replace('def ', '<purple>def</purple> ')
@@ -353,8 +357,8 @@ def get_example(str, name=None):    # use name to highlight the relevant class
             line = line.replace(f'{i}', f'<yellow>{i}</yellow>')
 
         # destyle Vec2 and Vec3
-        line = line.replace(f'<yellow>3</yellow>(', '3(')
-        line = line.replace(f'<yellow>2</yellow>(', '2(')
+        line = line.replace('<yellow>3</yellow>(', '3(')
+        line = line.replace('<yellow>2</yellow>(', '2(')
 
         # highlight class name
         if name:
@@ -386,7 +390,7 @@ def get_example(str, name=None):    # use name to highlight the relevant class
         for i in range(not is_quote, len(parts), 2):
             parts[i] = clear_tags(parts[i])
 
-            parts[i] = "<green>'''" + parts[i] + "'''</green>"
+            parts[i] = f"<green>'''{parts[i]}'''</green>"
 
         example = ''.join(parts)
 
@@ -396,7 +400,7 @@ def get_example(str, name=None):    # use name to highlight the relevant class
         quotes = re.findall('\'(.*?)\'', line)
         quotes = ['\'' + q + '\'' for q in quotes]
         for q in quotes:
-            line = line.replace(q, '<green>' + clear_tags(q) + '</green>')
+            line = line.replace(q, f'<green>{clear_tags(q)}</green>')
         styled_lines.append(line)
 
     example = '\n'.join(styled_lines)
@@ -415,13 +419,94 @@ def is_singleton(str):
 
 
 path = application.package_folder
-module_info = dict()
-class_info = dict()
-module_info['textures'] = ('', '', '', ('noise', 'grass', 'vignette', 'arrow_right', 'test_tileset', 'tilemap_test_level', 'shore', 'file_icon', 'sky_sunset', 'radial_gradient', 'circle', 'perlin_noise', 'brick', 'grass_tintable', 'circle_outlined', 'ursina_logo', 'arrow_down', 'cog', 'vertical_gradient', 'white_cube', 'horizontal_gradient', 'folder', 'rainbow', 'heightmap_1', 'sky_default',), (), ())
-module_info['models'] = ('', '', '', ('quad', 'wireframe_cube', 'plane', 'circle', 'diamond', 'wireframe_quad', 'sphere', 'cube', 'icosphere', 'cube_uv_top', 'arrow', 'sky_dome', ), (), ())
-module_info['shaders'] = ('', '', '', ('colored_lights_shader', 'fresnel_shader', 'projector_shader', 'instancing_shader', 'texture_blend_shader', 'matcap_shader', 'triplanar_shader', 'unlit_shader', 'geom_shader', 'normals_shader', 'transition_shader', 'noise_fog_shader', 'lit_with_shadows_shader', 'fxaa', 'camera_empty', 'ssao', 'camera_outline_shader', 'pixelation_shader', 'camera_contrast', 'camera_vertical_blur', 'camera_grayscale', ), (), ())
-
-
+class_info = {}
+module_info = {
+    'textures': (
+        '',
+        '',
+        '',
+        (
+            'noise',
+            'grass',
+            'vignette',
+            'arrow_right',
+            'test_tileset',
+            'tilemap_test_level',
+            'shore',
+            'file_icon',
+            'sky_sunset',
+            'radial_gradient',
+            'circle',
+            'perlin_noise',
+            'brick',
+            'grass_tintable',
+            'circle_outlined',
+            'ursina_logo',
+            'arrow_down',
+            'cog',
+            'vertical_gradient',
+            'white_cube',
+            'horizontal_gradient',
+            'folder',
+            'rainbow',
+            'heightmap_1',
+            'sky_default',
+        ),
+        (),
+        (),
+    ),
+    'models': (
+        '',
+        '',
+        '',
+        (
+            'quad',
+            'wireframe_cube',
+            'plane',
+            'circle',
+            'diamond',
+            'wireframe_quad',
+            'sphere',
+            'cube',
+            'icosphere',
+            'cube_uv_top',
+            'arrow',
+            'sky_dome',
+        ),
+        (),
+        (),
+    ),
+    'shaders': (
+        '',
+        '',
+        '',
+        (
+            'colored_lights_shader',
+            'fresnel_shader',
+            'projector_shader',
+            'instancing_shader',
+            'texture_blend_shader',
+            'matcap_shader',
+            'triplanar_shader',
+            'unlit_shader',
+            'geom_shader',
+            'normals_shader',
+            'transition_shader',
+            'noise_fog_shader',
+            'lit_with_shadows_shader',
+            'fxaa',
+            'camera_empty',
+            'ssao',
+            'camera_outline_shader',
+            'pixelation_shader',
+            'camera_contrast',
+            'camera_vertical_blur',
+            'camera_grayscale',
+        ),
+        (),
+        (),
+    ),
+}
 for f in path.glob('**/*.py'):
     with open(f, encoding='utf-8') as t:
         code = t.read()
@@ -429,7 +514,7 @@ for f in path.glob('**/*.py'):
 
         if not is_singleton(code):
             name = f.stem
-            attrs, funcs = list(), list()
+            attrs, funcs = [], []
             attrs = get_module_attributes(code)
             funcs = get_functions(code)
             example = get_example(code, name)
@@ -453,13 +538,12 @@ for f in path.glob('**/*.py'):
                     parent_class = class_name.split('(')[1].split(')')[0]
                     class_name =  class_name.split('(')[0]
                 class_info[class_name] = (f, parent_class, params, attrs, methods, example)
-        # singletons
         else:
             module_name = f.stem
             classes = get_classes(code)
             for class_name, class_definition in classes.items():
                 # print(module_name)
-                attrs, methods = list(), list()
+                attrs, methods = [], []
                 attrs = get_class_attributes(class_definition)
                 methods = get_functions(class_definition, is_class=True)
                 example = get_example(code, class_name)
@@ -475,8 +559,7 @@ def html_color(color):
 from textwrap import dedent
 # html += '''<div class="parent">''' ## index container
 html += '''<div class="sidebar">''' ## index container
-i = 0
-for group_name, group in groups.items():
+for i, (group_name, group) in enumerate(groups.items()):
     links = ''.join([f'\n            <a href="#{e}">{e}</a><br>' for e in group])
     html += f'''
     <div class="sidebar_box" style="color: hsl({30+(i*20)}deg 94% 21%);">
@@ -485,17 +568,16 @@ for group_name, group in groups.items():
         <br>
     </div>
     '''
-    i+= 1
 html += '</div>\n'
 html += '<main_section>\n'
 html += '    <h1 class="main_header">ursina API Reference</h1>\n'
 html += '    <p>v5.0.0</p>\n'
+init_text = ''
 # print(module_info)
 # main part
 for group_name, group in groups.items():
     # links = '\n     '.join([f'<a href="#{e}">{e}</a><br>' for e in group])
     for name in group:
-        init_text = ''
         is_class = name[0].isupper()
         data = None
         if name in module_info:
@@ -505,7 +587,6 @@ for group_name, group in groups.items():
 
         if not data:
             continue
-            print('no info found for', name)
         # f, params, attrs, methods, example = data
         location, parent_class, params, attrs, funcs, example = data
         params = params.replace('__init__', name.split('(')[0])

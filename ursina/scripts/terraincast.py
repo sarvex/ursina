@@ -50,15 +50,8 @@ def terraincast(world_position, terrain_entity, height_values=None, return_norma
 
 
         helper.y = point * terrain_entity.scale_y / 255
-        if not return_normals:
-            return helper.y
-
-        return helper.y, normal
-
-    if not return_normals:
-        return None
-
-    return None, None
+        return helper.y if not return_normals else (helper.y, normal)
+    return None if not return_normals else (None, None)
 
 
 if __name__ == '__main__':

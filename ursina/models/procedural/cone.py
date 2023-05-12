@@ -9,16 +9,13 @@ class Cone(Mesh):
         degrees_to_rotate = 360 / resolution
 
         verts = []
-        for i in range(resolution):
+        for _ in range(resolution):
             verts.append(Vec3(v[0], 0, v[1]))
             v = rotate_around_point_2d(v, origin, -degrees_to_rotate)
-            verts.append(Vec3(v[0], 0, v[1]))
-
-            verts.append(Vec3(0,height,0))
+            verts.extend((Vec3(v[0], 0, v[1]), Vec3(0,height,0)))
         if add_bottom:
-            for i in range(resolution):
-                verts.append(Vec3(v[0], 0, v[1]))
-                verts.append(Vec3(0,0,0))
+            for _ in range(resolution):
+                verts.extend((Vec3(v[0], 0, v[1]), Vec3(0,0,0)))
                 v = rotate_around_point_2d(v, origin, -degrees_to_rotate)
                 verts.append(Vec3(v[0], 0, v[1]))
 

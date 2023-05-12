@@ -28,7 +28,7 @@ void main() {
 }
 
 '''
-imported_shaders = dict()
+imported_shaders = {}
 
 class Shader:
     CG = Panda3dShader.SL_Cg
@@ -50,9 +50,9 @@ class Shader:
         self.geometry = geometry
 
         self.entity = None
-        self.default_input = dict()
+        self.default_input = {}
         self.compiled = False
-        if not self in imported_shaders:
+        if self not in imported_shaders:
             imported_shaders[self.name] = self
 
         for key, value in kwargs.items():
@@ -75,11 +75,11 @@ class Shader:
 
         for sh, name in parts.items():
             for folder in folders:
-                for filename in folder.glob('**/' + name):
+                for filename in folder.glob(f'**/{name}'):
                     with filename.open("rt") as f:
                         parts[sh] = f.read()
 
-        parts.update(kwargs)
+        parts |= kwargs
         return cls(language, **parts)
 
 

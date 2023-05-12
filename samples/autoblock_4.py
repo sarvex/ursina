@@ -48,7 +48,10 @@ print('----------', 'rotate meshes:', perf_counter() - t)
 tilemap = load_texture('autoblock_test_level')
 Entity(model='plane', texture=tilemap, scale=Vec3(tilemap.width, 1, tilemap.height), origin=(-.5,0,-.5), y=-.1)
 
-voxels = [[[0 for z in range(tilemap.height)]for y in range(16)] for x in range(tilemap.width)]
+voxels = [
+    [[0 for _ in range(tilemap.height)] for _ in range(16)]
+    for _ in range(tilemap.width)
+]
 
 for z in range(tilemap.height):
     for x in range(tilemap.width):
@@ -84,16 +87,14 @@ for i, e in enumerate([color.white, color.white, hsv(180,.03,.99), hsv(210,.02,.
 c = Empty()
 
 def add(type, pos, rotate=0, scale=Vec3(1,1,1), debug=False):
-    rotate_str = ''
-    if rotate:
-        rotate_str = f'_{int(rotate)}'
+    rotate_str = f'_{int(rotate)}' if rotate else ''
     # print('add:', f'{type}{rotate_str}')
     level.model.vertices.extend((v*scale) + pos + Vec3(.5,0,.5) for v in vertices[f'{type}{rotate_str}'])
     level.model.uvs.extend(tiles[type].uvs)
     if not debug:
         level.model.colors.extend(tiles[type].colors)
     else:
-        level.model.colors.extend([color.red for e in tiles[type].colors])
+        level.model.colors.extend([color.red for _ in tiles[type].colors])
 
 directions = (
     # Vec(0,-1,1), Vec(-1,-1,0), Vec(0,-1,0), Vec(1,-1,0), Vec(0,-1,-1),
@@ -113,7 +114,7 @@ def generate_codes_for(code, value, unknown='?'):
     codes_dict = {}
     for i in range(int(math.pow(2, number_of_possible_combinations))):  # get each possible binary number
         possible_combination = format(i, f'0{number_of_possible_combinations}b')
-        code_variant = [char for char in code]
+        code_variant = list(code)
 
         for j, index in enumerate(variable_indices):
             code_variant[index] = possible_combination[j]

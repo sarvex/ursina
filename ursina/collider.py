@@ -64,7 +64,7 @@ class MeshCollider(Collider):
     def __init__(self, entity, mesh=None, center=(0,0,0)):
         super().__init__()
         center = Vec3(center)
-        if mesh == None and entity.model:
+        if mesh is None and entity.model:
             mesh = entity.model
             # print('''auto generating mesh collider from entity's mesh''')
 

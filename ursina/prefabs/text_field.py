@@ -36,7 +36,7 @@ class TextField(Entity):
         self.highlight_color = color.color(120,1,1,.1)
         self.text = ''
         self.delimiters = ' .,!?;:(){}[]<>\'\"@#$%^&*+=-\\|/`~'
-        self.replacements = dict()
+        self.replacements = {}
         self.on_undo = []
         self.on_redo = []
         self.on_value_changed = None

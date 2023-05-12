@@ -175,7 +175,7 @@ class Ursina(ShowBase):
         if not is_raw and key in keyboard_keys:
             return
 
-        if not 'mouse' in key:
+        if 'mouse' not in key:
             for prefix in ('control-', 'shift-', 'alt-'):
                 if key.startswith(prefix):
                     key = key.replace('control-', '')
@@ -192,9 +192,8 @@ class Ursina(ShowBase):
 
         input_handler.input(key)
 
-        if not application.paused:
-            if hasattr(__main__, 'input'):
-                __main__.input(key)
+        if not application.paused and hasattr(__main__, 'input'):
+            __main__.input(key)
 
         for entity in scene.entities:
             if entity.enabled == False or entity.ignore or entity.ignore_input:
@@ -202,15 +201,22 @@ class Ursina(ShowBase):
             if application.paused and entity.ignore_paused == False:
                 continue
 
-            if hasattr(entity, 'input') and callable(entity.input):
-                if entity.input(key):
-                    break
+            if (
+                hasattr(entity, 'input')
+                and callable(entity.input)
+                and entity.input(key)
+            ):
+                break
 
             if hasattr(entity, 'scripts'):
                 for script in entity.scripts:
-                    if script.enabled and hasattr(script, 'input') and callable(script.input):
-                        if script.input(key):
-                            break
+                    if (
+                        script.enabled
+                        and hasattr(script, 'input')
+                        and callable(script.input)
+                        and script.input(key)
+                    ):
+                        break
 
 
         mouse.input(key)
@@ -224,9 +230,8 @@ class Ursina(ShowBase):
         if key == ' ' and input_handler.held_keys['control']:
             return
 
-        if not application.paused:
-            if hasattr(__main__, 'text_input'):
-                __main__.text_input(key)
+        if not application.paused and hasattr(__main__, 'text_input'):
+            __main__.text_input(key)
 
         for entity in scene.entities:
             if entity.enabled == False or entity.ignore or entity.ignore_input:

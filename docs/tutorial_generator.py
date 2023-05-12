@@ -46,7 +46,7 @@ for path in files:
 {path.stem.title().replace('_',' ')}
 # left, size 1, normal\n\n\n
 '''
-    for i, (comment, code) in enumerate(zip(comment_parts, code_parts)):
+    for comment, code in zip(comment_parts, code_parts):
         # text += f'## {i}\n'
         text += comment
         text += '\n# code\n'

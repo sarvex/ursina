@@ -100,9 +100,12 @@ class Entity(NodePath):
             if caller.code_context:
                 self.code_context = caller.code_context[0]
 
-                if (self.code_context.count('(') == self.code_context.count(')') and
-                ' = ' in self.code_context and not 'name=' in self.code_context
-                and not 'Ursina()' in self.code_context):
+                if (
+                    self.code_context.count('(') == self.code_context.count(')')
+                    and ' = ' in self.code_context
+                    and 'name=' not in self.code_context
+                    and 'Ursina()' not in self.code_context
+                ):
 
                     self.name = self.code_context.split(' = ')[0].strip().replace('self.', '')
                     # print('set name to:', self.code_context.split(' = ')[0].strip().replace('self.', ''))
@@ -161,9 +164,7 @@ class Entity(NodePath):
 
     @property
     def enabled(self):
-        if not hasattr(self, '_enabled'):
-            return True
-        return self._enabled
+        return True if not hasattr(self, '_enabled') else self._enabled
 
     @enabled.setter
     def enabled(self, value):
@@ -183,9 +184,8 @@ class Entity(NodePath):
         if value == True:
             if hasattr(self, 'is_singleton') and not self.is_singleton():
                 self.unstash()
-        else:
-            if hasattr(self, 'is_singleton') and not self.is_singleton():
-                self.stash()
+        elif hasattr(self, 'is_singleton') and not self.is_singleton():
+            self.stash()
 
         self._enabled = value
 
@@ -234,9 +234,8 @@ class Entity(NodePath):
                 self.color = self.color # reapply color after changing model
                 self.texture = self.texture # reapply texture after changing model
                 self._vert_cache = None
-                if isinstance(value, Mesh):
-                    if hasattr(value, 'on_assign'):
-                        value.on_assign(assigned_to=self)
+                if isinstance(value, Mesh) and hasattr(value, 'on_assign'):
+                    value.on_assign(assigned_to=self)
             return
 
         elif name == 'color' and value is not None:
@@ -292,7 +291,7 @@ class Entity(NodePath):
         if hasattr(self, '_parent') and self._parent and hasattr(self._parent, '_children') and self in self._parent._children:
             self._parent._children.remove(self)
 
-        if hasattr(value, '_children') and not self in value._children:
+        if hasattr(value, '_children') and self not in value._children:
             value._children.append(self)
 
         self.reparent_to(value)
@@ -308,7 +307,7 @@ class Entity(NodePath):
         if hasattr(self, '_parent') and self._parent and hasattr(self._parent, '_children') and self in self._parent._children:
             self._parent._children.remove(self)
 
-        if hasattr(value, '_children') and not self in value._children:
+        if hasattr(value, '_children') and self not in value._children:
             value._children.append(self)
 
         self.wrtReparentTo(value)
@@ -335,9 +334,7 @@ class Entity(NodePath):
 
     @property
     def visible_self(self): # set visibility of self, without affecting children.
-        if not hasattr(self, '_visible_self'):
-            return True
-        return self._visible_self
+        return True if not hasattr(self, '_visible_self') else self._visible_self
 
     @visible_self.setter
     def visible_self(self, value):
@@ -694,17 +691,13 @@ class Entity(NodePath):
         from ursina import camera
         p3d = camera.getRelativePoint(self, Vec3.zero())
         full = camera.lens.getProjectionMat().xform(Vec4(*p3d, 1))
-        recip_full3 = 1
-        if full[3] > 0:
-            recip_full3 = 1 / full[3]
+        recip_full3 = 1 / full[3] if full[3] > 0 else 1
         p2d = full * recip_full3
         return Vec2(p2d[0]*camera.aspect_ratio/2, p2d[1]/2)
 
     @property
     def shader(self):
-        if not hasattr(self, '_shader'):
-            return None
-        return self._shader
+        return None if not hasattr(self, '_shader') else self._shader
 
     @shader.setter
     def shader(self, value):
@@ -719,7 +712,7 @@ class Entity(NodePath):
             return
 
         if isinstance(value, str):
-            if not value in shader.imported_shaders:
+            if value not in shader.imported_shaders:
                 print_warning('missing shader:', value)
                 return
 
@@ -753,9 +746,7 @@ class Entity(NodePath):
 
     @property
     def texture(self):
-        if not hasattr(self, '_texture'):
-            return None
-        return self._texture
+        return None if not hasattr(self, '_texture') else self._texture
 
     @texture.setter
     def texture(self, value):
@@ -791,9 +782,7 @@ class Entity(NodePath):
 
     @property
     def texture_scale(self):
-        if not hasattr(self, '_texture_scale'):
-            return Vec2(1,1)
-        return self._texture_scale
+        return self._texture_scale if hasattr(self, '_texture_scale') else Vec2(1,1)
     @texture_scale.setter
     def texture_scale(self, value):
         self._texture_scale = value
@@ -803,9 +792,7 @@ class Entity(NodePath):
 
     @property
     def texture_offset(self):
-        if not hasattr(self, '_texture_offset'):
-            return Vec2(0,0)
-        return self._texture_offset
+        return self._texture_offset if hasattr(self, '_texture_offset') else Vec2(0,0)
 
     @texture_offset.setter
     def texture_offset(self, value):
@@ -855,9 +842,7 @@ class Entity(NodePath):
 
     @property
     def unlit(self):
-        if not hasattr(self, '_unlit'):
-            return False
-        return self._unlit
+        return False if not hasattr(self, '_unlit') else self._unlit
 
     @unlit.setter
     def unlit(self, value):
@@ -886,7 +871,7 @@ class Entity(NodePath):
 
     def generate_sphere_map(self, size=512, name=f'sphere_map_{len(scene.entities)}'):
         from ursina import camera
-        _name = 'textures/' + name + '.jpg'
+        _name = f'textures/{name}.jpg'
         org_pos = camera.position
         camera.position = self.position
         base.saveSphereMap(_name, size=size)
@@ -899,16 +884,16 @@ class Entity(NodePath):
 
     def generate_cube_map(self, size=512, name=f'cube_map_{len(scene.entities)}'):
         from ursina import camera
-        _name = 'textures/' + name
+        _name = f'textures/{name}'
         org_pos = camera.position
         camera.position = self.position
-        base.saveCubeMap(_name+'.jpg', size=size)
+        base.saveCubeMap(f'{_name}.jpg', size=size)
         camera.position = org_pos
 
         # print('saved cube map:', name + '.jpg')
         self.model.setTexGen(TextureStage.getDefault(), TexGenAttrib.MWorldCubeMap)
-        self.reflection_map = _name + '#.jpg'
-        self.model.setTexture(loader.loadCubeMap(_name + '#.jpg'), 1)
+        self.reflection_map = f'{_name}#.jpg'
+        self.model.setTexture(loader.loadCubeMap(f'{_name}#.jpg'), 1)
 
 
     @property
@@ -925,9 +910,7 @@ class Entity(NodePath):
 
     @property
     def model_center(self):
-        if not self.model:
-            return Vec3(0,0,0)
-        return self.model.getTightBounds().getCenter()
+        return self.model.getTightBounds().getCenter() if self.model else Vec3(0,0,0)
 
     @property
     def bounds(self):
@@ -986,9 +969,7 @@ class Entity(NodePath):
         elif not isinstance(target, Vec3):
             target = Vec3(*target)
 
-        up_axis = self.up
-        if up:
-            up_axis = up
+        up_axis = up if up else self.up
         self.lookAt(target, up_axis)
 
         if axis == 'forward':
@@ -1023,30 +1004,28 @@ class Entity(NodePath):
         p = self
         if isinstance(possible_ancestor, Entity):
             # print('ENTITY')
-            for i in range(100):
+            for _ in range(100):
                 if p.parent:
                     if p.parent == possible_ancestor:
                         return True
 
                     p = p.parent
 
-        if isinstance(possible_ancestor, list) or isinstance(possible_ancestor, tuple):
+        if isinstance(possible_ancestor, (list, tuple)):
             # print('LIST OR TUPLE')
             for e in possible_ancestor:
-                for i in range(100):
+                for _ in range(100):
                     if p.parent:
                         if p.parent == e:
                             return True
-                            break
                         p = p.parent
 
         elif isinstance(possible_ancestor, str):
             # print('CLASS NAME', possible_ancestor)
-            for i in range(100):
+            for _ in range(100):
                 if p.parent:
                     if p.parent.__class__.__name__ == possible_ancestor:
                         return True
-                        break
                     p = p.parent
 
         return False
@@ -1078,7 +1057,7 @@ class Entity(NodePath):
         if not target_class:
             target_class = self.__class__
 
-        changes = dict()
+        changes = {}
         for key, value in target_class.default_values.items():
             attr = getattr(self, key)
 
@@ -1132,7 +1111,7 @@ class Entity(NodePath):
             from ursina.ursinastuff import invoke
             return invoke(self.animate, name, value, duration=duration, curve=curve, loop=loop, resolution=resolution, time_step=time_step, auto_destroy=auto_destroy, delay=delay)
 
-        animator_name = name + '_animator'
+        animator_name = f'{name}_animator'
         # print('start animating value:', name, animator_name )
         if interrupt and hasattr(self, animator_name):
             getattr(getattr(self, animator_name), interrupt)() # call kill() or finish() depending on what the interrupt value is.
@@ -1161,9 +1140,7 @@ class Entity(NodePath):
     def animate_position(self, value, duration=.1, **kwargs):
         x = self.animate('x', value[0], duration,  **kwargs)
         y = self.animate('y', value[1], duration,  **kwargs)
-        z = None
-        if len(value) > 2:
-            z = self.animate('z', value[2], duration, **kwargs)
+        z = self.animate('z', value[2], duration, **kwargs) if len(value) > 2 else None
         return x, y, z
 
     def animate_rotation(self, value, duration=.1,  **kwargs):
@@ -1197,7 +1174,7 @@ class Entity(NodePath):
         self.shake_sequence = Sequence(Wait(delay))
         original_position = getattr(self, attr_name)
 
-        for i in range(int(duration / speed)):
+        for _ in range(int(duration / speed)):
             self.shake_sequence.append(Func(setattr, self, attr_name,
                 Vec3(
                     original_position[0] + (random.uniform(-.1, .1) * magnitude * direction[0]),
@@ -1269,7 +1246,7 @@ class Entity(NodePath):
             if e.get_into_node_path().parent not in ignore
             ]
 
-        if len(self.entries) == 0:
+        if not self.entries:
             self.hit = HitInfo(hit=False, distance=0)
             return self.hit
 
@@ -1295,9 +1272,14 @@ class Entity(NodePath):
         self.hit.world_normal = Vec3(*normal)
 
         self.hit.entities = []
-        for collision in self.entries:
-            self.hit.entities.append(next(e for e in scene.entities if e == collision.get_into_node_path().parent))
-
+        self.hit.entities.extend(
+            next(
+                e
+                for e in scene.entities
+                if e == collision.get_into_node_path().parent
+            )
+            for collision in self.entries
+        )
         return self.hit
 
 

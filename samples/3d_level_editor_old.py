@@ -47,18 +47,14 @@ class LevelEditor(Entity):
             elif mouse.hovered_entity in self.selection:
                 self.selection.remove(mouse.hovered_entity)
 
-            elif mouse.hovered_entity in self.entities and not mouse.hovered_entity in self.selection:
+            elif mouse.hovered_entity in self.entities:
                 if held_keys['shift']:
                     self.selection.append(mouse.hovered_entity)
                 else:
                     self.selection = [mouse.hovered_entity, ]
 
             for e in self.entities:
-                if e in self.selection:
-                    e.color = color.azure
-                else:
-                    e.color = color.light_gray
-
+                e.color = color.azure if e in self.selection else color.light_gray
             self.gizmo.enabled = bool(self.selection)
             if self.selection:
                 self.gizmo.position = self.selection[-1].position
@@ -69,14 +65,12 @@ class LevelEditor(Entity):
 
 
         # print(key)
-        if key in ('s', 'r'):
-            # if not self.selection and mouse.hovered_entity in self.entities:
-            #     self.selection = [mouse.hovered_entity, ]
-            for e in self.selection:
+        for e in self.selection:
+                # print(key)
+            if key in ('s', 'r'):
                 e.world_parent = self.gizmo
 
-        elif key in ('s up', 'r up'):
-            for e in self.selection:
+            elif key in ('s up', 'r up'):
                 e.world_parent = self
 
 
@@ -128,19 +122,20 @@ class LevelEditor(Entity):
             clone.model = copy(target.model)
             clone.start_dragging()
 
-        if held_keys['control'] and key == 'c' and mouse.hovered_entity in self.entities:
-            self.entity_to_paste = {
-                'rotation' : mouse.hovered_entity.rotation,
-                'scale' : mouse.hovered_entity.scale,
-                'color' : mouse.hovered_entity.color,
-                'model_name' : mouse.hovered_entity.model.name,
-            }
-            if mouse.hovered_entity.texture:
-                self.entity_to_paste['texture'] = mouse.hovered_entity.texture.name
+        if held_keys['control']:
+            if key == 'c' and mouse.hovered_entity in self.entities:
+                self.entity_to_paste = {
+                    'rotation' : mouse.hovered_entity.rotation,
+                    'scale' : mouse.hovered_entity.scale,
+                    'color' : mouse.hovered_entity.color,
+                    'model_name' : mouse.hovered_entity.model.name,
+                }
+                if mouse.hovered_entity.texture:
+                    self.entity_to_paste['texture'] = mouse.hovered_entity.texture.name
 
-        if held_keys['control'] and key == 'v' and self.entity_to_paste:
-            self.grid.collision = True
-            invoke(self.add_entity, *self.entity_to_paste.values(), delay=.01)
+            if key == 'v' and self.entity_to_paste:
+                self.grid.collision = True
+                invoke(self.add_entity, *self.entity_to_paste.values(), delay=.01)
 
 
 

@@ -43,7 +43,7 @@ class Text(Entity):
         for color_name in color.color_names:
             self.text_colors[color_name] = color.colors[color_name]
 
-        self.tag = Text.start_tag+'default'+Text.end_tag
+        self.tag = f'{Text.start_tag}default{Text.end_tag}'
         self.current_color = self.text_colors['default']
         self.scale_override = 1
         self._background = None
@@ -66,10 +66,7 @@ class Text(Entity):
     @property
     def text(self):
         t = ''
-        y = 0
-        if self.text_nodes:
-            y = self.text_nodes[0].getY()
-
+        y = self.text_nodes[0].getY() if self.text_nodes else 0
         for tn in self.text_nodes:
             if y != tn.getY():
                 t += '\n'
@@ -108,7 +105,7 @@ class Text(Entity):
         text = self.start_tag + self.end_tag + str(text) # start with empty tag for alignment to work?
         sections = []
         section = ''
-        tag = self.start_tag+'default'+self.end_tag
+        tag = f'{self.start_tag}default{self.end_tag}'
         temp_text_node = TextNode('temp_text_node')
         temp_text_node.setFont(self.font)
         x = 0
@@ -148,7 +145,7 @@ class Text(Entity):
         for i, s in enumerate(sections):
             tag = s[1]
             # move the text after image one space right
-            if tag.startswith(self.start_tag+'image:'):
+            if tag.startswith(f'{self.start_tag}image:'):
                 for f in sections:
                     if f[3] == s[3] and f[2] > s[2]:
                         f[2] += .5
@@ -200,14 +197,13 @@ class Text(Entity):
                     origin=(.0, -.25),
                     add_to_scene_entities=False,
                     )
-                if not image.texture:
-                    destroy(image)
-                else:
+                if image.texture:
                     self.images.append(image)
 
-            else:
-                if tag in self.text_colors:
-                    self.current_color = self.text_colors[tag]
+                else:
+                    destroy(image)
+            elif tag in self.text_colors:
+                self.current_color = self.text_colors[tag]
 
         self.text_node_path.setScale(self.scale_override * self.size)
         self.text_node.setText(text)
@@ -231,8 +227,7 @@ class Text(Entity):
 
     @font.setter
     def font(self, value):
-        font = loader.loadFont(value)
-        if font:
+        if font := loader.loadFont(value):
             self._font = font
             self._font.clear()  # remove assertion warning
             self._font.setPixelsPerUnit(self.resolution)
@@ -302,10 +297,7 @@ class Text(Entity):
 
     @property
     def wordwrap(self): # set this to make the text wrap after a certain number of characters.
-        if hasattr(self, '_wordwrap'):
-            return self._wordwrap
-        else:
-            return 0
+        return self._wordwrap if hasattr(self, '_wordwrap') else 0
 
     @wordwrap.setter
     def wordwrap(self, value):
@@ -315,7 +307,7 @@ class Text(Entity):
 
         new_text = ''
         x = 0
-        for word in self.raw_text.replace(self.end_tag, self.end_tag+' ').split(' '):
+        for word in self.raw_text.replace(self.end_tag, f'{self.end_tag} ').split(' '):
 
             if word.startswith(self.start_tag) and new_text:
                 new_text = new_text[:-1]
@@ -327,7 +319,7 @@ class Text(Entity):
                 new_text += '\n'
                 x = 0
 
-            new_text += word + ' '
+            new_text += f'{word} '
 
         self.text = new_text
 
@@ -410,12 +402,12 @@ class Text(Entity):
 
         x = 0
         self.appear_sequence = Sequence()
-        for i, tn in enumerate(self.text_nodes):
+        for tn in self.text_nodes:
             target_text = tn.node().getText()
             tn.node().setText('')
             new_text = ''
 
-            for j, char in enumerate(target_text):
+            for char in target_text:
                 new_text += char
                 self.appear_sequence.append(Wait(speed))
                 self.appear_sequence.append(Func(tn.node().setText, new_text))
@@ -424,8 +416,8 @@ class Text(Entity):
         return self.appear_sequence
 
 
-    def get_width(string, font=None):
-        t = Text(string)
+    def get_width(self, font=None):
+        t = Text(self)
         if font:
             t.font = font
         w = t.width

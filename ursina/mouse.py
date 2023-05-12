@@ -95,9 +95,7 @@ class Mouse():
 
     @property
     def locked(self):
-        if not hasattr(self, '_locked'):
-            return False
-        return self._locked
+        return False if not hasattr(self, '_locked') else self._locked
 
     @locked.setter
     def locked(self, value):
@@ -119,9 +117,7 @@ class Mouse():
 
     @property
     def visible(self):
-        if not hasattr(self, '_visible'):
-            return True
-        return self._visible
+        return True if not hasattr(self, '_visible') else self._visible
 
     @visible.setter
     def visible(self, value):
@@ -180,14 +176,14 @@ class Mouse():
 
         if key == 'left mouse up':
             self.left = False
-        if key == 'right mouse down':
-            self.right = True
-        if key == 'right mouse up':
-            self.right = False
-        if key == 'middle mouse down':
+        elif key == 'middle mouse down':
             self.middle = True
-        if key == 'middle mouse up':
+        elif key == 'middle mouse up':
             self.middle = False
+        elif key == 'right mouse down':
+            self.right = True
+        elif key == 'right mouse up':
+            self.right = False
 
 
 
@@ -254,27 +250,19 @@ class Mouse():
 
     @property
     def normal(self): # returns the normal of the polygon, in local space.
-        if not self.collision is not None:
-            return None
-        return Vec3(*self.collision.normal)
+        return None if self.collision is None else Vec3(*self.collision.normal)
 
     @property
     def world_normal(self): # returns the normal of the polygon, in world space.
-        if not self.collision is not None:
-            return None
-        return Vec3(*self.collision.world_normal)
+        return None if self.collision is None else Vec3(*self.collision.world_normal)
 
     @property
     def point(self): # returns the point hit, in local space
-        if self.collision is not None:
-            return Vec3(*self.collision.point)
-        return None
+        return Vec3(*self.collision.point) if self.collision is not None else None
 
     @property
     def world_point(self): # returns the point hit, in world space
-        if self.collision is not None:
-            return Vec3(*self.collision.world_point)
-        return None
+        return None if self.collision is None else Vec3(*self.collision.world_point)
 
     def find_collision(self):
         self.collisions = []
@@ -288,18 +276,17 @@ class Mouse():
         for entry in self._pq.getEntries():
             for entity in scene.entities:
                 if entry.getIntoNodePath().parent == entity and entity.collision:
-                    if entity.collision:
-                        hit = HitInfo(
-                            hit = entry.collided(),
-                            entity = entity,
-                            distance = distance(entry.getSurfacePoint(scene), camera.getPos()),
-                            point = entry.getSurfacePoint(entity),
-                            world_point = entry.getSurfacePoint(scene),
-                            normal = entry.getSurfaceNormal(entity),
-                            world_normal = entry.getSurfaceNormal(scene),
-                            )
-                        self.collisions.append(hit)
-                        break
+                    hit = HitInfo(
+                        hit = entry.collided(),
+                        entity = entity,
+                        distance = distance(entry.getSurfacePoint(scene), camera.getPos()),
+                        point = entry.getSurfacePoint(entity),
+                        world_point = entry.getSurfacePoint(scene),
+                        normal = entry.getSurfaceNormal(entity),
+                        world_normal = entry.getSurfaceNormal(scene),
+                        )
+                    self.collisions.append(hit)
+                    break
 
         if self.collisions:
             self.collision = self.collisions[0]

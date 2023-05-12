@@ -76,7 +76,7 @@ class HealthBar(Button):
 
 
     def __setattr__(self, name, value):
-        if 'scale' and hasattr(self, 'model') and self.model:  # update rounded corners of background when scaling
+        if hasattr(self, 'model') and self.model:  # update rounded corners of background when scaling
             self.model.aspect = self.world_scale_x / self.world_scale_y
             self.model.generate()
 
@@ -92,9 +92,9 @@ if __name__ == '__main__':
     # health_bar_1.show_lines = True
 
     def input(key):
-        if key == '+' or key == '+ hold':
+        if key in ['+', '+ hold']:
             health_bar_1.value += 10
-        if key == '-' or key == '- hold':
+        if key in ['-', '- hold']:
             health_bar_1.value -= 10
             print('ow')
     app.run()

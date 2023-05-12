@@ -32,12 +32,12 @@ class Scrollable():
 
         if self.entity.hovered or mouse.hovered_entity.has_ancestor(self.entity):
             # print(key)
-            if key == 'scroll up':
-                self.target_value -= self.scroll_speed
             if key == 'scroll down':
                 self.target_value += self.scroll_speed
 
 
+            elif key == 'scroll up':
+                self.target_value -= self.scroll_speed
             self.target_value = max(min(self.target_value, self.max), self.min)
 
 

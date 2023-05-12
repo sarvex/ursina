@@ -132,9 +132,7 @@ class Camera(Entity):
 
     @property
     def shader(self):
-        if not hasattr(self, '_shader'):
-            return None
-        return self._shader
+        return None if not hasattr(self, '_shader') else self._shader
 
     @shader.setter
     def shader(self, value):

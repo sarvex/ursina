@@ -66,7 +66,7 @@ class VideoRecorder(Entity):
 
     def input(self, key):
         combo = ['control', 'r', 'e', 'c']
-        if key in combo and all([held_keys[e] for e in combo]):
+        if key in combo and all(held_keys[e] for e in combo):
             if not self.recording:
                 self.start_recording()
             else:
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     shootables_parent = Entity()
     mouse.traverse_target = shootables_parent
 
-    for i in range(16):
+    for _ in range(16):
         Entity(model='cube', origin_y=-.5, scale=2, texture='brick', texture_scale=(1,2),
             x=random.uniform(-8,8),
             z=random.uniform(-8,8) + 8,

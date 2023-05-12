@@ -8,7 +8,14 @@ class NoclipMode:
 
 
     def input(self, key):
-        if key == 'shift':
+        if key == 'shift up':
+            # assign them back again
+            if hasattr(self.entity, 'update'):
+                self.entity.update = self._entity_original_update
+            if hasattr(self.entity, 'input'):
+                self.entity.input = self._entity_original_input
+
+        elif key == 'shift':
             # turn of entity's update and input functions
             if hasattr(self.entity, 'update'):
                 self._entity_original_update = self.entity.update
@@ -16,13 +23,6 @@ class NoclipMode:
             if hasattr(self.entity, 'input'):
                 self._entity_original_input = self.entity.input
                 self.entity.input = None
-
-        if key == 'shift up':
-            # assign them back again
-            if hasattr(self.entity, 'update'):
-                self.entity.update = self._entity_original_update
-            if hasattr(self.entity, 'input'):
-                self.entity.input = self._entity_original_input
 
 
     def update(self):
@@ -50,7 +50,14 @@ class NoclipMode2d:
 
 
     def input(self, key):
-        if key == 'shift':
+        if key == 'shift up':
+            # assign them back again
+            if hasattr(self.entity, 'update'):
+                self.entity.update = self._entity_original_update
+            if hasattr(self.entity, 'input'):
+                self.entity.input = self._entity_original_input
+
+        elif key == 'shift':
             # turn of entity's update and input functions
             if hasattr(self.entity, 'update'):
                 self._entity_original_update = self.entity.update
@@ -58,13 +65,6 @@ class NoclipMode2d:
             if hasattr(self.entity, 'input'):
                 self._entity_original_input = self.entity.input
                 self.entity.input = None
-
-        if key == 'shift up':
-            # assign them back again
-            if hasattr(self.entity, 'update'):
-                self.entity.update = self._entity_original_update
-            if hasattr(self.entity, 'input'):
-                self.entity.input = self._entity_original_input
 
 
     def update(self):

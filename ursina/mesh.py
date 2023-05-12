@@ -112,12 +112,11 @@ class Mesh(NodePath):
             self.indices = []
 
             if self._triangles:
-                if isinstance(self._triangles[0], int):
-                    for t in self._triangles:
+                for t in self._triangles:
+                    if isinstance(self._triangles[0], int):
                         self.indices.append(t)
 
-                elif len(self._triangles[0]) >= 3: # if tris are tuples like this: ((0,1,2), (1,2,3))
-                    for t in self._triangles:
+                    elif len(self._triangles[0]) >= 3: # if tris are tuples like this: ((0,1,2), (1,2,3))
                         if len(t) == 3:
                             self.indices.extend(t)
 
@@ -125,7 +124,7 @@ class Mesh(NodePath):
                             self.indices.extend([t[i]for i in (0,1,2,2,3,0)])
 
             else:
-                self.indices = [i for i in range(len(self.vertices))]
+                self.indices = list(range(len(self.vertices)))
 
             prim = Mesh._modes[self.mode](static_mode)
 
@@ -187,10 +186,7 @@ class Mesh(NodePath):
 
 
     def __repr__(self):
-        if not self.name == 'mesh':
-            return self.name
-        else:
-            return self.recipe
+        return self.name if self.name != 'mesh' else self.recipe
 
 
     def __add__(self, other):
@@ -222,7 +218,7 @@ class Mesh(NodePath):
 
     @property
     def triangles(self):
-        if self._triangles == None:
+        if self._triangles is None:
             self._triangles = [(i, i+1, i+2) for i in range(0, len(self.vertices), 3)]
 
         return self._triangles
@@ -258,7 +254,7 @@ class Mesh(NodePath):
 
         if not name and hasattr(self, 'path'):
             name = self.path.stem
-            if not '.' in name:
+            if '.' not in name:
                 name += '.ursinamesh'
 
         if name.endswith('ursinamesh'):

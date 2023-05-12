@@ -15,7 +15,12 @@ def combine(combine_parent, analyze=False, auto_destroy=True, ignore=[]):
             continue
 
         if e.has_ancestor(combine_parent) or e == combine_parent:
-            if not hasattr(e, 'model') or e.model == None or e.scripts or e.eternal:
+            if (
+                not hasattr(e, 'model')
+                or e.model is None
+                or e.scripts
+                or e.eternal
+            ):
                 continue
             if not hasattr(e.model, 'vertices') or not e.model.vertices:
                 e.model = load_model(e.model.name, use_deepcopy=True)
@@ -30,10 +35,10 @@ def combine(combine_parent, analyze=False, auto_destroy=True, ignore=[]):
             verts += [vertex_to_world_matrix.xformPoint(v) for v in e.model.vertices]
 
             if not e.model.triangles:
-                new_tris = [i for i in range(len(e.model.vertices))]
+                new_tris = list(range(len(e.model.vertices)))
 
             else:
-                new_tris = list()
+                new_tris = []
                 for t in e.model.triangles:
                     if isinstance(t, int):
                         new_tris.append(t)

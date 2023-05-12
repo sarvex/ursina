@@ -57,7 +57,13 @@ build_game = True
 compile_to_pyc = True
 
 for i, arg in enumerate(sys.argv):
-    if arg == '--help':
+    if arg == '--compile_to_pyc=False':
+        compile_to_pyc = False
+
+
+    elif arg == '--compile_to_pyc=True':
+        compile_to_pyc = True
+    elif arg == '--help':
         print(dedent('''
             package ursina application for windows10.
             provided with project folder path, creates a build folder where
@@ -88,35 +94,30 @@ for i, arg in enumerate(sys.argv):
             ignore.append(sys.argv[j])
             print('ignoring', sys.argv[j])
 
-    elif arg == '--name':
-        project_name = sys.argv[i+1]
-
     elif arg == '--include_modules':
         include_modules = sys.argv[i+1].split(',')
+
+    elif arg == '--name':
+        project_name = sys.argv[i+1]
 
     elif arg == '--skip_engine':
         build_engine = False
     elif arg == '--skip_game':
         build_game = False
 
-    elif arg == '--compile_to_pyc=True':
-        compile_to_pyc = True
-    elif arg == '--compile_to_pyc=False':
-        compile_to_pyc = False
-
-
-if (build_engine and python_dest.exists() or (build_game and src_dest.exists())):
-    if not '--overwrite' in sys.argv:
-        for e in (python_dest, src_dest):
-            msg = f'Folder {e} already exists. \nProceed to delete and overwrite?'
-            overwrite = input("%s (y/N) " % msg).lower() == 'y'
-            # if not overwrite:
-            #     print('stopped building')
-            #     exit()
-            if e == python_dest:
-                build_engine = overwrite
-            elif e == src_dest:
-                build_game = overwrite
+if (
+    build_engine and python_dest.exists() or (build_game and src_dest.exists())
+) and '--overwrite' not in sys.argv:
+    for e in (python_dest, src_dest):
+        msg = f'Folder {e} already exists. \nProceed to delete and overwrite?'
+        overwrite = input(f"{msg} (y/N) ").lower() == 'y'
+        # if not overwrite:
+        #     print('stopped building')
+        #     exit()
+        if e == python_dest:
+            build_engine = overwrite
+        elif e == src_dest:
+            build_game = overwrite
 
 
 print('building project:', project_folder)
@@ -189,7 +190,12 @@ if build_engine:
             'models'
             ):
             continue
-        print('copying:', f, '-->', str(python_dest / 'Lib/site-packages/panda3d/' / f.name))
+        print(
+            'copying:',
+            f,
+            '-->',
+            python_dest / 'Lib/site-packages/panda3d/' / f.name,
+        )
         if f.is_file():
             copy(str(f), str(python_dest / 'Lib/site-packages/panda3d/' / f.name))
         else:
@@ -247,7 +253,7 @@ if build_game:
             parents = f.relative_to(project_folder).parents
             if 'scenes' in parents:
                 continue
-            py_compile.compile(f, src_dest / (str(f)[len(str(project_folder))+1:]+'c'))
+            py_compile.compile(f, src_dest / f'{str(f)[len(str(project_folder)) + 1:]}c')
 
         ignore_patterns.append('.py')
 
@@ -271,9 +277,7 @@ if build_game:
 
 
     print('creating .bat file')
-    c = ''
-    if compile:
-        c = 'c'
+    c = 'c' if compile else ''
     with Path(build_folder / f'{project_name}.bat').open('w') as f:
         f.write(dedent(fr'''
             chcp 65001

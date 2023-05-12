@@ -106,8 +106,3 @@ def update():
 # ## Start the game
 #
 app.run()
-
-# ## Adding level graphics
-#
-# Coming later
-pass

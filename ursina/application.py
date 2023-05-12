@@ -12,13 +12,10 @@ print_entity_definition = False
 
 package_folder = Path(__file__).parent
 asset_folder = Path(sys.argv[0]).parent
-blender_paths = dict()
+blender_paths = {}
 
-development_mode = True
 dirs = [e.stem for e in asset_folder.parent.iterdir() if e.is_dir()]
-if 'src' in dirs and 'python' in dirs:
-    development_mode = False
-
+development_mode = 'src' not in dirs or 'python' not in dirs
 window_type = 'onscreen'
 
 print_info = development_mode

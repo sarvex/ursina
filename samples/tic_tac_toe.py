@@ -15,7 +15,7 @@ bg = Entity(parent=scene, model='quad', texture='shore', scale=(16,8), z=10, col
 mouse.visible = False
 
 # create a matrix to store the buttons in. makes it easier to check for victory
-board = [[None for x in range(3)] for y in range(3)]
+board = [[None for _ in range(3)] for _ in range(3)]
 
 for y in range(3):
     for x in range(3):

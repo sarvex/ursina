@@ -45,7 +45,7 @@ for z in range(h):
 # terrain.model.colors = [color.black for v in terrain.model.vertices]
 terrain.model.generate()
 
-terrain.model.height_values =[[0 for x in range(w)] for y in range(h)]
+terrain.model.height_values = [[0 for _ in range(w)] for _ in range(h)]
 # from ursina.prefabs.first_person_controller import FirstPersonController
 
 ec = EditorCamera(rotation_smoothing=0, enabled=1, rotation=(30,30,0))
@@ -79,7 +79,7 @@ def make_gradient(index_color_dict):    # returns a list of 256 colors
     given a dict of positions and colors, interpolates the colors into a list of 256 colors
     example input: {'0':color.hex('#9d9867'), '38':color.hex('#828131'), '54':color.hex('#5d5b2a'), '255':color.hex('#000000')}
     '''
-    gradient = [color.black for i in range(256)]
+    gradient = [color.black for _ in range(256)]
 
     gradient_color_keys = tuple(index_color_dict.keys())
     gradient_color_values = tuple(index_color_dict.values())
@@ -126,14 +126,13 @@ def update():
                     brush_falloff = 1 - (distance_2d((0,0), (x_offset,z_offset)) / 4)
 
                     if true_x >= 0 and true_x+1 < w and true_z >= 0 and true_z+1 < h:
-                        if not held_keys['shift']:
-                            if not held_keys['alt']:
-                                terrain.model.height_values[true_z][true_x] += strength * brush_falloff * time.dt
-                            else:
-                                terrain.model.height_values[true_z][true_x] -= strength * brush_falloff * time.dt
-                        else:   #smooth
+                        if held_keys['shift']:
                             terrain.model.height_values[true_z][true_x] = lerp(terrain.model.height_values[true_z][true_x], average_height, strength * brush_falloff * time.dt)
 
+                        elif held_keys['alt']:
+                            terrain.model.height_values[true_z][true_x] -= strength * brush_falloff * time.dt
+                        else:
+                            terrain.model.height_values[true_z][true_x] += strength * brush_falloff * time.dt
             terrain.model.vertices = []
             terrain.model.colors = []
             for z, column in enumerate(terrain.model.height_values):

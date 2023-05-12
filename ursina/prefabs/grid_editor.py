@@ -14,7 +14,7 @@ class GridEditor(Entity):
         sys.setrecursionlimit(self.w * self.h)
         # self.grid = [[palette[0] for x in range(self.w)] for y in range(self.h)]
         if not hasattr(self, 'grid'):
-            self.grid = [[palette[0] for y in range(self.h)] for x in range(self.w)]
+            self.grid = [[palette[0] for _ in range(self.h)] for _ in range(self.w)]
         self.brush_size = 1
         self.auto_render = True
         self.cursor = Entity(parent=self, model=Quad(segments=0, mode='line', thickness=2), origin=(-.5,-.5), scale=(1/self.w, 1/self.h), color=color.color(120,1,1,.5), z=-.2)
@@ -25,7 +25,7 @@ class GridEditor(Entity):
         self.lock_axis = None
         self.outline = Entity(parent=self, model=Quad(segments=0, mode='line', thickness=2), color=color.cyan, z=.01, origin=(-.5,-.5))
 
-        self.undo_cache = list()
+        self.undo_cache = []
         self.undo_cache.append(deepcopy(self.grid))
         self.undo_index = 0
 
@@ -101,11 +101,11 @@ class GridEditor(Entity):
             if mouse.left or mouse.right:
                 if held_keys['shift'] and self.prev_draw:
                     if not self.lock_axis:
-                        if abs(mouse.velocity[0]) > abs(mouse.velocity[1]):
-                            self.lock_axis = 'horizontal'
-                        else:
-                            self.lock_axis = 'vertical'
-
+                        self.lock_axis = (
+                            'horizontal'
+                            if abs(mouse.velocity[0]) > abs(mouse.velocity[1])
+                            else 'vertical'
+                        )
                     if self.lock_axis == 'horizontal':
                         self.cursor.y = self.prev_draw[1] / self.h
 
@@ -117,24 +117,23 @@ class GridEditor(Entity):
                 x = int(round(self.cursor.x * self.w))
 
 
-                if not held_keys['alt'] and not mouse.right:
-                    if self.prev_draw is not None and distance_2d(self.prev_draw, (x,y)) > 1:
-                        dist = distance_2d(self.prev_draw, (x,y))
+                if held_keys['alt'] or mouse.right:
+                    self.selected_char = self.grid[x][y]
 
-                        if dist > 1: # draw line
-                            for i in range(int(dist)+1):
-                                inbetween_pos = lerp(self.prev_draw, (x,y), i/dist)
-                                self.draw(int(inbetween_pos[0]), int(inbetween_pos[1]))
+                elif self.prev_draw is not None and distance_2d(self.prev_draw, (x,y)) > 1:
+                    dist = distance_2d(self.prev_draw, (x,y))
 
-                            self.draw(x, y)
-                            self.prev_draw = (x,y)
+                    if dist > 1: # draw line
+                        for i in range(int(dist)+1):
+                            inbetween_pos = lerp(self.prev_draw, (x,y), i/dist)
+                            self.draw(int(inbetween_pos[0]), int(inbetween_pos[1]))
 
-                    else:
                         self.draw(x, y)
                         self.prev_draw = (x,y)
 
                 else:
-                    self.selected_char = self.grid[x][y]
+                    self.draw(x, y)
+                    self.prev_draw = (x,y)
 
 
 
@@ -200,9 +199,8 @@ class GridEditor(Entity):
             self.cursor.scale = Vec2(self.brush_size / self.w, self.brush_size / self.h)
             self.prev_draw = None
 
-        if held_keys['control'] and key == 's':
-            if hasattr(self, 'save'):
-                self.save()
+        if held_keys['control'] and key == 's' and hasattr(self, 'save'):
+            self.save()
 
 
     def record_undo(self):

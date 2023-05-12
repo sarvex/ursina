@@ -97,7 +97,10 @@ if __name__ == '__main__':
 
     def input(key):
         if key == 'space':  # randomize the terrain
-            terrain_from_list.model.height_values = [[random.uniform(0,255) for a in column] for column in terrain_from_list.model.height_values]
+            terrain_from_list.model.height_values = [
+                [random.uniform(0, 255) for _ in column]
+                for column in terrain_from_list.model.height_values
+            ]
             terrain_from_list.model.generate()
 
     EditorCamera()

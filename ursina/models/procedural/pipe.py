@@ -39,8 +39,7 @@ class Pipe(Mesh):
         # cap start
         if self.cap_ends:
             for i in range(len(self.prev.children)):
-                verts.append(self.path[0])
-                verts.append(self.prev.children[i].world_position)
+                verts.extend((self.path[0], self.prev.children[i].world_position))
                 if i >= len(self.prev.children)-1:
                     verts.append(self.prev.children[0].world_position)
                 else:
@@ -106,9 +105,7 @@ class Pipe(Mesh):
                     verts.append(self.curr.children[0].world_position)
                 else:
                     verts.append(self.curr.children[i+1].world_position)
-                verts.append(self.curr.children[i].world_position)
-                verts.append(self.path[-1])
-
+                verts.extend((self.curr.children[i].world_position, self.path[-1]))
                 if self.color_gradient:
                     self.colors.extend([self.color_gradient[-1], ]*3)
 

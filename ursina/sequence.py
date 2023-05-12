@@ -101,11 +101,7 @@ class Sequence():
         if self.paused:
             return
 
-        if self.time_step is None:
-            self.t += time.dt
-        else:
-            self.t += self.time_step
-
+        self.t += time.dt if self.time_step is None else self.time_step
         for f in self.funcs:
             if not f.finished and f.delay <= self.t:
                 f()

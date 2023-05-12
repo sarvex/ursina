@@ -21,7 +21,7 @@ class Button(Entity):
                 setattr(self, key, value)
 
         if Button.default_model is None:
-            if not 'model' in kwargs and self.scale[0] != 0 and self.scale[1] != 0:
+            if 'model' not in kwargs and self.scale[0] != 0 and self.scale[1] != 0:
                 self.model = Quad(aspect=self.scale[0] / self.scale[1], radius=radius)
         else:
             self.model = Button.default_model
@@ -65,10 +65,7 @@ class Button(Entity):
 
     @property
     def text_origin(self):
-        if not self.text_entity:
-            return(0,0)
-
-        return self.text_entity.origin
+        return (0, 0) if not self.text_entity else self.text_entity.origin
 
     @text_origin.setter
     def text_origin(self, value):
@@ -139,10 +136,9 @@ class Button(Entity):
         if self.disabled or not self.model:
             return
 
-        if key == 'left mouse down':
-            if self.hovered:
-                self.model.setColorScale(self.pressed_color)
-                self.model.setScale(Vec3(self.pressed_scale, self.pressed_scale, 1))
+        if key == 'left mouse down' and self.hovered:
+            self.model.setColorScale(self.pressed_color)
+            self.model.setScale(Vec3(self.pressed_scale, self.pressed_scale, 1))
 
         if key == 'left mouse up':
             if self.hovered:

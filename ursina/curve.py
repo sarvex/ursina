@@ -28,10 +28,7 @@ def out_quad(t):
 
 
 def in_out_quad(t):
-    if t < .5:
-        return 2 * t * t
-    else:
-        return - 1 + (4 - 2 * t) * t
+    return 2 * t * t if t < .5 else - 1 + (4 - 2 * t) * t
 
 
 def in_cubic(t):
@@ -44,10 +41,7 @@ def out_cubic(t):
 
 
 def in_out_cubic(t):
-    if t < .5:
-        return 4 * t * t * t
-    else:
-        return (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
+    return 4 * t * t * t if t < .5 else (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
 
 
 def in_quart(t):
@@ -78,10 +72,7 @@ def out_quint(t):
 
 def in_out_quint(t):
     t1 = t - 1
-    if t < .5:
-        return 16 * t * t * t * t * t
-    else:
-        return 1 + 16 * t1 * t1 * t1 * t1 * t1
+    return 16 * t * t * t * t * t if t < .5 else 1 + 16 * t1 * t1 * t1 * t1 * t1
 
 
 def in_expo(t):
@@ -148,7 +139,7 @@ def in_out_back(t, magnitude=1.70158):
 
 
 def in_elastic(t, magnitude=.7):
-    if t == 0 or t == 1:
+    if t in [0, 1]:
         return t
     scaledTime = t / 1
     scaledTime1 = scaledTime - 1
@@ -165,7 +156,7 @@ def out_elastic(t, magnitude=.7):
     p = 1 - magnitude
     scaledTime = t * 2
 
-    if t == 0 or t == 1:
+    if t in [0, 1]:
         return t
 
     s = p / (2 * pi) * asin(1)
@@ -177,7 +168,7 @@ def out_elastic(t, magnitude=.7):
 
 def in_out_elastic(t, magnitude=0.65):
     p = 1 - magnitude
-    if t == 0 or t == 1:
+    if t in [0, 1]:
         return t
 
     scaledTime = t * 2
@@ -220,10 +211,7 @@ def in_bounce(t):
 
 
 def in_out_bounce(t):
-    if t < .5:
-        return in_bounce(t * 2) * .5
-
-    return (out_bounce((t * 2) - 1) * .5) + .5
+    return in_bounce(t * 2) * .5 if t < .5 else (out_bounce((t * 2) - 1) * .5) + .5
 
 
 # generate boomeranged versions of all the functions

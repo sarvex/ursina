@@ -11,8 +11,8 @@ from time import perf_counter
 from ursina.string_utilities import print_info, print_warning
 from ursina import color
 
-imported_meshes = dict()
-blender_scenes = dict()
+imported_meshes = {}
+blender_scenes = {}
 
 def load_model(name, path=application.asset_folder, file_types=('.bam', '.ursinamesh', '.obj', '.glb', '.gltf', '.blend'), use_deepcopy=False):
     if not isinstance(name, str):
@@ -177,7 +177,9 @@ def get_blender(blend_file):    # try to get a matching blender version in case 
     with open(blend_file, 'rb') as f:
         try:
             blender_version_number = (f.read(12).decode("utf-8"))[-3:]   # get version from start of .blend file e.g. 'BLENDER-v280'
-            blender_version_number = blender_version_number[0] + '.' + blender_version_number[1:2]
+            blender_version_number = (
+                f'{blender_version_number[0]}.{blender_version_number[1:2]}'
+            )
             print_info('blender_version:', blender_version_number)
             if blender_version_number in application.blender_paths:
                 return application.blender_paths[blender_version_number]
@@ -202,7 +204,7 @@ def compress_models(path=None, outpath=application.compressed_models_folder, nam
     for blend_file in path.glob(f'**/{name}.blend'):
         blender = get_blender(blend_file)
 
-        out_file_path = outpath / (blend_file.stem + '.obj')
+        out_file_path = outpath / f'{blend_file.stem}.obj'
         print_info('converting .blend file to .obj:', blend_file, '-->', out_file_path, 'using:', blender)
 
         if platform.system() == 'Windows':
@@ -393,7 +395,7 @@ def compress_models_fast(model_name=None, write_to_disk=False):
         if f.endswith('.blend'):
             # print('f:', application.compressed_models_folder + '/' + f)
             print('compress______', f)
-            blend = BlenderFile(application.models_folder + '/' + f)
+            blend = BlenderFile(f'{application.models_folder}/{f}')
             number_of_objects = len(blend.list('Object'))
 
             for o in blend.list('Object'):
@@ -407,7 +409,7 @@ def compress_models_fast(model_name=None, write_to_disk=False):
                 verts = [v.co for v in o.data.mvert]
                 verts = tuple(verts)
 
-                file_content = 'Mesh(' + str(verts)
+                file_content = f'Mesh({verts}'
 
                 file_name = ''.join([f.split('.')[0], '.ursinamesh'])
                 if number_of_objects > 1:
@@ -418,15 +420,12 @@ def compress_models_fast(model_name=None, write_to_disk=False):
                 tris = tuple(triindex.v for triindex in o.data.mloop)
                 flippedtris = []
                 for i in range(0, len(tris)-3, 3):
-                    flippedtris.append(tris[i+2])
-                    flippedtris.append(tris[i+1])
-                    flippedtris.append(tris[i+0])
-
-                file_content += ', triangles=' + str(flippedtris)
+                    flippedtris.extend((tris[i+2], tris[i+1], tris[i+0]))
+                file_content += f', triangles={flippedtris}'
 
                 if o.data.mloopuv:
                     uvs = tuple(v.uv for v in o.data.mloopuv)
-                    file_content += ', uvs=' + str(uvs)
+                    file_content += f', uvs={uvs}'
 
                 file_content += ''', mode='triangle')'''
 
@@ -441,7 +440,7 @@ def ursina_mesh_to_obj(mesh, name='', out_path=application.compressed_models_fol
 
     if not name:
         name = camel_to_snake(mesh.__class__.__name__)
-    obj = 'o ' + name + '\n'
+    obj = f'o {name}' + '\n'
 
 
     for v in mesh.vertices:
@@ -481,14 +480,14 @@ def ursina_mesh_to_obj(mesh, name='', out_path=application.compressed_models_fol
             obj += '\nf '
         obj += str(t+1)
         if mesh.uvs:
-            obj += '/'+str(t+1)
+            obj += f'/{str(t + 1)}'
         obj += ' '
 
 
     # print(obj)
-    with open(out_path / (name + '.obj'), 'w') as f:
+    with open(out_path / f'{name}.obj', 'w') as f:
         f.write(obj)
-        print_info('saved obj:', out_path / (name + '.obj'))
+        print_info('saved obj:', out_path / f'{name}.obj')
 
 
 

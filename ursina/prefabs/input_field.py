@@ -1,10 +1,12 @@
 from ursina import *
 from enum import Enum
 
+
+
 class ContentTypes:
     int = '0123456789'
-    float = int + '.,'
-    math = float + '+-*/'
+    float = f'{int}.,'
+    math = f'{float}+-*/'
 
 
 class InputField(Button):
@@ -43,7 +45,10 @@ class InputField(Button):
                 self.text_field.text_entity.text = replacement_char * len(self.text_field.text)
                 return
 
-            if self.on_value_changed and not self.text_field.text_entity.text == self.text_field.text:
+            if (
+                self.on_value_changed
+                and self.text_field.text_entity.text != self.text_field.text
+            ):
                 self.on_value_changed()
             self.text_field.text_entity.text = self.text_field.text
 
@@ -58,7 +63,12 @@ class InputField(Button):
         self.active = False
 
         if label:
-            self.label = Text(str(label) + ':', parent = self, position = self.text_field.position, scale = 1.25)
+            self.label = Text(
+                f'{str(label)}:',
+                parent=self,
+                position=self.text_field.position,
+                scale=1.25,
+            )
             self.text_field.x += 0.1 * (len(str(label)) + 1.0) / 6.0
 
 

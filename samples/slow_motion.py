@@ -32,11 +32,7 @@ def input(key):
         destroy(bullet, delay=1)
 
     if key == 'tab':
-        # application.paused = not application.paused
-        if application.time_scale == 1:
-            application.time_scale = .3
-        else:
-            application.time_scale = 1
+        application.time_scale = .3 if application.time_scale == 1 else 1
 
 
 

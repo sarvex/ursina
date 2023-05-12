@@ -28,7 +28,7 @@ def update():
 def input(key):
     if key == 'left mouse down':
         grid[int(cursor.x)][int(cursor.y)].enabled = True
-    if key == 'right mouse down':
+    elif key == 'right mouse down':
         grid[int(cursor.x)][int(cursor.y)].enabled = False
 
 

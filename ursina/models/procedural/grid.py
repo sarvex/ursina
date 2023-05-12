@@ -6,17 +6,13 @@ class Grid(Mesh):
         self.width = width
         self.height = height
 
-        verts = list()
-        tris = list()
+        verts = []
+        tris = []
 
         for x in range(int(width) + 1):
-            verts.append(Vec3(-.5 + (x/width), -.5, 0))
-            verts.append(Vec3(-.5 + (x/width), .5, 0))
-
+            verts.extend((Vec3(-.5 + (x/width), -.5, 0), Vec3(-.5 + (x/width), .5, 0)))
         for y in range(int(height) + 1):
-            verts.append((-.5, -.5 + (y/height), 0))
-            verts.append((.5, -.5 + (y/height), 0))
-
+            verts.extend(((-.5, -.5 + (y/height), 0), (.5, -.5 + (y/height), 0)))
         tris = [(i, i+1) for i in range(0, len(verts), 2)]
 
         super().__init__(verts, triangles=tris, mode=mode, thickness=thickness, **kwargs)

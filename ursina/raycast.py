@@ -53,7 +53,7 @@ def raycast(origin, direction=(0,0,1), distance=inf, traverse_target=scene, igno
         and ursinamath.distance(_raycaster.world_position, Vec3(*e.get_surface_point(render))) <= distance
         ]
 
-    if len(_raycaster.entries) == 0:
+    if not _raycaster.entries:
         _raycaster.hit = HitInfo(hit=False, distance=distance)
         return _raycaster.hit
 
@@ -78,9 +78,6 @@ def raycast(origin, direction=(0,0,1), distance=inf, traverse_target=scene, igno
 
     _raycaster.hit.normal = Vec3(*_raycaster.collision.get_surface_normal(_raycaster.collision.get_into_node_path().parent).normalized())
     _raycaster.hit.world_normal = Vec3(*_raycaster.collision.get_surface_normal(render).normalized())
-    return _raycaster.hit
-
-    _raycaster.hit = HitInfo(hit=False, distance=distance)
     return _raycaster.hit
 
 
@@ -146,10 +143,7 @@ if __name__ == '__main__':
         # print(ray.distance, ray2.distance)
         intersection_marker.world_position = ray.world_point
         intersection_marker.visible = ray.hit
-        if ray.hit:
-            d.color = color.azure
-        else:
-            d.color = color.orange
+        d.color = color.azure if ray.hit else color.orange
 
     t = time.time()
     # ray = raycast(e.world_position, e.forward, 3, debug=True)

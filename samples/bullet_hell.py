@@ -54,9 +54,8 @@ def input(key):
 
 
 
-enemies = []
 enemy = Entity(model=Circle(3), rotation_z=180, position=(0, 16), color=color.red, z=-1, speed=3, hp=5)
-enemies.append(enemy)
+enemies = [enemy]
 
 def enemy_update():
     for e in enemies:

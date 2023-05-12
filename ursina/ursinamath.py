@@ -51,14 +51,8 @@ def lerp(a, b, t):
         return Color(col[0], col[1], col[2], col[3])
 
     elif isinstance(a, (tuple, list, Vec2, Vec3, Vec4, LVector3f)) and isinstance(b, (tuple, list, Vec2, Vec3, Vec4, LVector3f)):
-        lerped = []
-        for i in range(min(len(a), len(b))):
-            lerped.append(lerp(a[i], b[i], t))
-
-        if isinstance(a, (tuple, list)):
-            return type(a)(lerped)
-        else:
-            return type(a)(*lerped)
+        lerped = [lerp(a[i], b[i], t) for i in range(min(len(a), len(b)))]
+        return type(a)(lerped) if isinstance(a, (tuple, list)) else type(a)(*lerped)
     else:
         print(f'''can't lerp types {type(a)} and {type(b)}''')
 
@@ -131,9 +125,7 @@ def size_list():
     #return a list of current python objects sorted by size
     globals_list = []
     globals_list.clear()
-    for e in globals():
-        # object, size
-        globals_list.append([e, sys.getsizeof(e)])
+    globals_list.extend([e, sys.getsizeof(e)] for e in globals())
     globals_list.sort(key=operator.itemgetter(1), reverse=True)
     print('scene size:', globals_list)
 

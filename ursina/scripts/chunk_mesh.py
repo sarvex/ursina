@@ -9,7 +9,7 @@ terrain = Entity(model=Terrain('heightmap_1', skip=8), texture='grass', texture_
 
 
 # grid = [[[None for z in range(8)] for y in range(1)] for x in range(8)] # make 2d array of entities
-grid = [[None for z in range(8)] for x in range(8)] # make 2d array of entities
+grid = [[None for _ in range(8)] for _ in range(8)]
 
 x_slices = 8
 # y = 1
@@ -58,16 +58,6 @@ from ursina.prefabs.first_person_controller import FirstPersonController
 # player.add_script(NoclipMode())
 # player = EditorCamera(rotation_x=90, y=128)
 EditorCamera()
-
-
-# def update():
-#     for part in terrain.children:
-#         part.enabled = distance_xz(part.world_position, player.world_position) < 256/8
-        # print(distance_xz(part.world_position, camera.world_position), 256/4)
-
-
-
-
 
 
 app.run()

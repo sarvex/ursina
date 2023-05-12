@@ -149,9 +149,7 @@ class Texture():
         pixels = []
 
         for y in range(start[1], end[1]):
-            for x in range(start[0], end[0]):
-                pixels.append(self.get_pixel(x,y))
-
+            pixels.extend(self.get_pixel(x,y) for x in range(start[0], end[0]))
         return pixels
 
     def set_pixel(self, x, y, color):
